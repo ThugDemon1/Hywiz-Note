@@ -13,7 +13,7 @@ interface Template {
   tags: string[];
 }
 
-const templates: Template[] = [
+export const templates: Template[] = [
   {
     id: 'meeting-notes',
     name: 'Meeting Notes',

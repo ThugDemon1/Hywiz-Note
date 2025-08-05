@@ -1,22 +1,26 @@
 import { create } from 'zustand';
 import api from '../lib/api';
+import socket from '../lib/socket';
 
 export interface Note {
   _id: string;
   title: string;
-  content: string;
-  plainTextContent: string;
   userId: string;
-  notebookId: {
+  notebookIds: Array<{
     _id: string;
     name: string;
     color: string;
-  };
+  }> | string[];
+  primaryNotebookId: {
+    _id: string;
+    name: string;
+    color: string;
+  } | string;
   tags: Array<{
     _id: string;
     name: string;
     color: string;
-  }>;
+  }> | string[];
   attachments: Array<{
     filename: string;
     originalName: string;
@@ -28,13 +32,28 @@ export interface Note {
   isPinned: boolean;
   isDeleted: boolean;
   deletedAt?: string;
-  reminderDate?: string;
-  reminderCompleted: boolean;
-  wordCount: number;
   lastViewedAt: string;
   createdAt: string;
   updatedAt: string;
-  reminderNotified?: boolean;
+  collaborators?: Array<{
+    userId: string | {
+      _id: string;
+      name: string;
+      email: string;
+    };
+    permission: 'read' | 'write' | 'admin';
+    addedAt: string;
+  }>;
+  shareSettings?: {
+    isPublic: boolean;
+    allowEdit: boolean;
+    allowComments: boolean;
+    passwordProtected: boolean;
+    password: string;
+    expiresAt: string;
+    publicUrl?: string;
+  };
+
 }
 
 interface NotesState {
@@ -53,11 +72,9 @@ interface NotesState {
   totalPages: number;
   total: number;
   savedSearches: any[];
-  upcomingReminders: any[];
   sharedWithMe: any[];
   sharedByMe: any[];
   bulkPermanentDelete: (noteIds: string[]) => Promise<void>;
-  dueReminders: Note[];
 
   // Actions
   fetchNotes: (filters?: any) => Promise<void>;
@@ -75,7 +92,7 @@ interface NotesState {
   selectMultipleNotes: (ids: string[]) => void;
   clearSelection: () => void;
   searchNotes: (query: string) => Promise<void>;
-  autoSaveNote: (id: string, content: string, plainTextContent: string) => void;
+  autoSaveNote: (id: string, title: string) => void;
   bulkOperation: (action: string, noteIds: string[], data?: any) => Promise<void>;
   setSortBy: (sortBy: 'updatedAt' | 'createdAt' | 'title') => void;
   setSortOrder: (order: 'asc' | 'desc') => void;
@@ -84,11 +101,6 @@ interface NotesState {
   createSavedSearch: (data: { name: string; query: string; filters: any }) => Promise<void>;
   updateSavedSearch: (id: string, data: { name: string; query: string; filters: any }) => Promise<void>;
   deleteSavedSearch: (id: string) => Promise<void>;
-  setReminder: (noteId: string, reminderDate: string | null, reminderRecurring: any) => Promise<void>;
-  clearReminder: (noteId: string) => Promise<void>;
-  completeReminder: (noteId: string) => Promise<void>;
-  fetchUpcomingReminders: () => Promise<void>;
-  updateReminderRecurring: (noteId: string, reminderRecurring: any) => Promise<void>;
   shareNote: (noteId: string, collaboratorId: string, permission: string) => Promise<void>;
   updateCollaborator: (noteId: string, collaboratorId: string, permission: string) => Promise<void>;
   removeCollaborator: (noteId: string, collaboratorId: string) => Promise<void>;
@@ -96,8 +108,8 @@ interface NotesState {
   fetchSharedByMe: () => Promise<void>;
   uploadAttachment: (noteId: string, file: File) => Promise<any>;
   removeAttachment: (noteId: string, filename: string) => Promise<void>;
-  checkDueReminders: () => Promise<void>;
   fetchBacklinks: (noteId: string) => Promise<{ _id: string; title: string }[]>;
+  saveSharedNote: (id: string) => Promise<Note>;
 }
 
 export const useNotesStore = create<NotesState>((set, get) => ({
@@ -116,26 +128,15 @@ export const useNotesStore = create<NotesState>((set, get) => ({
   totalPages: 1,
   total: 0,
   savedSearches: [],
-  upcomingReminders: [],
   sharedWithMe: [],
   sharedByMe: [],
-  bulkPermanentDelete: async (noteIds) => {
+  bulkPermanentDelete: async (noteIds: string[]) => {
     try {
       await api.post('/notes/bulk-permanent', { noteIds });
       get().fetchNotes();
     } catch (error) {
       console.error('Bulk permanent delete error:', error);
       throw error;
-    }
-  },
-  dueReminders: [],
-  checkDueReminders: async () => {
-    try {
-      const now = new Date().toISOString();
-      const res = await api.get('/notes', { params: { reminderDue: now, deleted: false } });
-      set({ dueReminders: res.data.notes.filter((n: Note) => n.reminderDate && !n.reminderCompleted && !n.reminderNotified && new Date(n.reminderDate) <= new Date()) });
-    } catch (err) {
-      set({ dueReminders: [] });
     }
   },
 
@@ -257,6 +258,23 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     }
   },
 
+  saveSharedNote: async (id: string) => {
+    try {
+      const response = await api.post(`/notes/${id}/save-shared`);
+      const savedNote = response.data;
+      
+      set(state => ({
+        notes: [savedNote, ...state.notes],
+        total: state.total + 1
+      }));
+      
+      return savedNote;
+    } catch (error) {
+      console.error('Save shared note error:', error);
+      throw error;
+    }
+  },
+
   pinNote: async (id: string, isPinned: boolean) => {
     try {
       await get().updateNote(id, { isPinned });
@@ -348,7 +366,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     }
   },
 
-  autoSaveNote: async (id: string, content: string, plainTextContent: string) => {
+  autoSaveNote: async (id: string, title: string) => {
     const { autoSaveTimeout } = get();
     
     // Clear existing timeout
@@ -360,7 +378,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     const timeout = setTimeout(async () => {
       try {
         set({ saving: true });
-        await get().updateNote(id, { content, plainTextContent });
+        await get().updateNote(id, { title });
       } catch (error) {
         console.error('Auto-save error:', error);
       } finally {
@@ -435,52 +453,9 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     }
   },
 
-  setReminder: async (noteId, reminderDate, reminderRecurring) => {
-    try {
-      await api.patch(`/notes/${noteId}/reminder`, { reminderDate, reminderRecurring });
-      await get().fetchUpcomingReminders();
-    } catch (err) {
-      console.error('Set reminder error:', err);
-    }
-  },
 
-  clearReminder: async (noteId) => {
-    try {
-      await api.patch(`/notes/${noteId}/reminder`, { reminderDate: null });
-      await get().fetchUpcomingReminders();
-    } catch (err) {
-      console.error('Clear reminder error:', err);
-    }
-  },
 
-  completeReminder: async (noteId) => {
-    try {
-      await api.patch(`/notes/${noteId}/reminder/complete`);
-      await get().fetchUpcomingReminders();
-    } catch (err) {
-      console.error('Complete reminder error:', err);
-    }
-  },
-
-  fetchUpcomingReminders: async () => {
-    try {
-      const res = await api.get('/notes/reminders/upcoming');
-      set({ upcomingReminders: res.data });
-    } catch (err) {
-      console.error('Fetch upcoming reminders error:', err);
-    }
-  },
-
-  updateReminderRecurring: async (noteId, reminderRecurring) => {
-    try {
-      await api.patch(`/notes/${noteId}/reminder/recurring`, { reminderRecurring });
-      await get().fetchUpcomingReminders();
-    } catch (err) {
-      console.error('Update recurring reminder error:', err);
-    }
-  },
-
-  shareNote: async (noteId, collaboratorId, permission) => {
+  shareNote: async (noteId: string, collaboratorId: string, permission: string) => {
     try {
       await api.post(`/notes/${noteId}/share`, { collaboratorId, permission });
       await get().fetchSharedByMe();
@@ -489,7 +464,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     }
   },
 
-  updateCollaborator: async (noteId, collaboratorId, permission) => {
+  updateCollaborator: async (noteId: string, collaboratorId: string, permission: string) => {
     try {
       await api.patch(`/notes/${noteId}/share`, { collaboratorId, permission });
       await get().fetchSharedByMe();
@@ -498,7 +473,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     }
   },
 
-  removeCollaborator: async (noteId, collaboratorId) => {
+  removeCollaborator: async (noteId: string, collaboratorId: string) => {
     try {
       await api.delete(`/notes/${noteId}/share/${collaboratorId}`);
       await get().fetchSharedByMe();
@@ -558,3 +533,30 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     return res.data;
   },
 }));
+
+// --- SOCKET.IO REALTIME LISTENERS ---
+if (typeof window !== 'undefined' && !(window as any)._notesListenersAdded) {
+  (window as any)._notesListenersAdded = true;
+
+  socket.on('note-shared', (updatedNote) => {
+    useNotesStore.setState(state => ({
+      notes: state.notes.map(note =>
+        note._id === updatedNote._id ? { ...note, ...updatedNote } : note
+      ),
+      currentNote: state.currentNote?._id === updatedNote._id
+        ? { ...state.currentNote, ...updatedNote }
+        : state.currentNote,
+    }));
+  });
+
+  socket.on('collaborator-updated', (updatedNote) => {
+    useNotesStore.setState(state => ({
+      notes: state.notes.map(note =>
+        note._id === updatedNote._id ? { ...note, ...updatedNote } : note
+      ),
+      currentNote: state.currentNote?._id === updatedNote._id
+        ? { ...state.currentNote, ...updatedNote }
+        : state.currentNote,
+    }));
+  });
+}

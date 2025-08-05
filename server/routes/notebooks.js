@@ -52,7 +52,8 @@ router.post('/', auth, async (req, res) => {
     });
 
     await notebook.save();
-
+    // Emit real-time update
+    req.io.emit('notebook-created', { notebook, userId: req.userId });
     res.status(201).json(notebook);
   } catch (error) {
     console.error('Create notebook error:', error);
@@ -83,7 +84,8 @@ router.put('/:id', auth, async (req, res) => {
     if (coverImage !== undefined) notebook.coverImage = coverImage;
 
     await notebook.save();
-
+    // Emit real-time update
+    req.io.emit('notebook-updated', { notebook, userId: req.userId });
     res.json(notebook);
   } catch (error) {
     console.error('Update notebook error:', error);
@@ -115,18 +117,19 @@ router.delete('/:id', auth, async (req, res) => {
 
     if (defaultNotebook) {
       await Note.updateMany(
-        { notebookId: req.params.id },
-        { notebookId: defaultNotebook._id }
+        { primaryNotebookId: req.params.id },
+        { primaryNotebookId: defaultNotebook._id }
       );
 
       // Update note counts
-      const noteCount = await Note.countDocuments({ notebookId: req.params.id });
+      const noteCount = await Note.countDocuments({ primaryNotebookId: req.params.id });
       defaultNotebook.noteCount += noteCount;
       await defaultNotebook.save();
     }
 
     await Notebook.findByIdAndDelete(req.params.id);
-
+    // Emit real-time update
+    req.io.emit('notebook-deleted', { notebookId: req.params.id, userId: req.userId });
     res.json({ message: 'Notebook deleted' });
   } catch (error) {
     console.error('Delete notebook error:', error);
@@ -149,7 +152,7 @@ router.get('/:id/notes', auth, async (req, res) => {
     }
 
     const notes = await Note.find({
-      notebookId: req.params.id,
+      primaryNotebookId: req.params.id,
       userId: req.userId,
       isDeleted: false
     })
@@ -158,7 +161,7 @@ router.get('/:id/notes', auth, async (req, res) => {
       .skip((page - 1) * limit);
 
     const total = await Note.countDocuments({
-      notebookId: req.params.id,
+      primaryNotebookId: req.params.id,
       userId: req.userId,
       isDeleted: false
     });

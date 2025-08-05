@@ -1,29 +1,34 @@
 import mongoose from 'mongoose';
 
 const noteSchema = new mongoose.Schema({
-  title: {
+  noteId: {
     type: String,
     required: true,
+    unique: true,
+    default: function() { return this._id.toString(); }
+  },
+  title: {
+    type: String,
+    required: false,
     trim: true,
     default: 'Untitled'
-  },
-  content: {
-    type: String,
-    default: ''
-  },
-  plainTextContent: {
-    type: String,
-    default: ''
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  notebookId: {
+  notebookIds: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Notebook'
+  }],
+  primaryNotebookId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Notebook',
-    required: true
+    required: false,
+    default: function() {
+      return this.notebookId || null;
+    }
   },
   tags: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -49,19 +54,7 @@ const noteSchema = new mongoose.Schema({
     default: false
   },
   deletedAt: Date,
-  reminderDate: Date,
-  reminderCompleted: {
-    type: Boolean,
-    default: false
-  },
-  reminderNotified: {
-    type: Boolean,
-    default: false
-  },
-  wordCount: {
-    type: Number,
-    default: 0
-  },
+
   lastViewedAt: {
     type: Date,
     default: Date.now
@@ -90,41 +83,33 @@ const noteSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     },
-    publicUrl: String,
+    allowEdit: {
+      type: Boolean,
+      default: false
+    },
     allowComments: {
       type: Boolean,
       default: false
-    }
-  },
-  history: [{
-    title: String,
-    content: String,
-    plainTextContent: String,
-    attachments: [
-      {
-        filename: String,
-        originalName: String,
-        url: String,
-        type: String,
-        size: Number,
-        uploadedAt: Date
-      }
-    ],
-    tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
-    updatedAt: Date,
-    version: Number
-  }],
-  reminderRecurring: {
-    frequency: {
+    },
+    passwordProtected: {
+      type: Boolean,
+      default: false
+    },
+    password: {
       type: String,
-      enum: ['none', 'daily', 'weekly', 'monthly', 'yearly'],
-      default: 'none'
+      default: ''
     },
-    interval: {
-      type: Number,
-      default: 1
+    expiresAt: {
+      type: String,
+      default: ''
     },
-    daysOfWeek: [Number] // For weekly recurrence (0=Sunday, 6=Saturday)
+    publicUrl: String
+  },
+
+
+  yjsUpdate: {
+    type: Buffer, // Store the canonical Yjs update as a binary Buffer
+    required: false
   },
 }, {
   timestamps: true
@@ -132,23 +117,86 @@ const noteSchema = new mongoose.Schema({
 
 // Indexes for better query performance
 noteSchema.index({ userId: 1, isDeleted: 1 });
-noteSchema.index({ notebookId: 1, isDeleted: 1 });
+noteSchema.index({ notebookIds: 1, isDeleted: 1 });
 noteSchema.index({ userId: 1, isPinned: 1 });
 noteSchema.index({ userId: 1, lastViewedAt: -1 });
 noteSchema.index({ userId: 1, updatedAt: -1 });
 noteSchema.index({ tags: 1 });
-noteSchema.index({ title: 'text', content: 'text', plainTextContent: 'text' });
+noteSchema.index({ title: 'text' });
 
-// Virtual for excerpt
+// Virtual for excerpt (now derived from YJS content)
 noteSchema.virtual('excerpt').get(function() {
-  return this.plainTextContent.substring(0, 150) + (this.plainTextContent.length > 150 ? '...' : '');
+  // This will be calculated from YJS content when needed
+  return '';
 });
 
-// Pre-save middleware to update word count
+// Virtual for word count (now derived from YJS content)
+noteSchema.virtual('wordCount').get(function() {
+  // This will be calculated from YJS content when needed
+  return 0;
+});
+
+// Virtual for backward compatibility with notebookId
+noteSchema.virtual('notebookId').get(function() {
+  return this.primaryNotebookId;
+});
+
+// Ensure virtuals are included in JSON output
+noteSchema.set('toJSON', { virtuals: true });
+noteSchema.set('toObject', { virtuals: true });
+
+// Migration middleware to handle old notebookId structure
 noteSchema.pre('save', function(next) {
-  if (this.plainTextContent) {
-    this.wordCount = this.plainTextContent.trim().split(/\s+/).length;
+  // If this note has the old notebookId field but no primaryNotebookId
+  if (this.notebookId && !this.primaryNotebookId) {
+    this.primaryNotebookId = this.notebookId;
+    this.notebookIds = [this.notebookId];
+    // Remove the old field
+    this.notebookId = undefined;
   }
+  // If this note has primaryNotebookId but no notebookIds
+  if (this.primaryNotebookId && (!this.notebookIds || this.notebookIds.length === 0)) {
+    this.notebookIds = [this.primaryNotebookId];
+  }
+  next();
+});
+
+// Pre-findOneAndUpdate middleware
+noteSchema.pre('findOneAndUpdate', function(next) {
+  const update = this.getUpdate();
+  if (update && update.notebookId && !update.primaryNotebookId) {
+    update.primaryNotebookId = update.notebookId;
+    update.notebookIds = [update.notebookId];
+    delete update.notebookId;
+  }
+  next();
+});
+
+// Pre-find middleware to handle old notebookId queries
+noteSchema.pre('find', function() {
+  // If querying by notebookId, also check primaryNotebookId
+  if (this._conditions && this._conditions.notebookId) {
+    this._conditions.$or = [
+      { primaryNotebookId: this._conditions.notebookId },
+      { notebookIds: this._conditions.notebookId }
+    ];
+    delete this._conditions.notebookId;
+  }
+});
+
+noteSchema.pre('findOne', function() {
+  // If querying by notebookId, also check primaryNotebookId
+  if (this._conditions && this._conditions.notebookId) {
+    this._conditions.$or = [
+      { primaryNotebookId: this._conditions.notebookId },
+      { notebookIds: this._conditions.notebookId }
+    ];
+    delete this._conditions.notebookId;
+  }
+});
+
+noteSchema.pre('save', function(next) {
+  console.log('[DEBUG] Note is being saved:', this._id, this.collaborators);
   next();
 });
 

@@ -124,3 +124,22 @@ export const useTagsStore = create<TagsState>((set, get) => ({
     }
   },
 }));
+
+// --- SOCKET.IO REALTIME LISTENERS ---
+import socket from '../lib/socket';
+if (typeof window !== 'undefined' && socket && !(window as any)._tagsListenersAdded) {
+  socket.on('tag-created', ({ tag }) => {
+    useTagsStore.setState(state => ({ tags: [...state.tags, tag] }));
+  });
+  socket.on('tag-updated', ({ tag }) => {
+    useTagsStore.setState(state => ({
+      tags: state.tags.map(t => t._id === tag._id ? tag : t)
+    }));
+  });
+  socket.on('tag-deleted', ({ tagId }) => {
+    useTagsStore.setState(state => ({
+      tags: state.tags.filter(t => t._id !== tagId)
+    }));
+  });
+  (window as any)._tagsListenersAdded = true;
+}

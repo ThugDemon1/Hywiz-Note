@@ -6,7 +6,7 @@ interface Stats {
   totalNotes: number;
   totalNotebooks: number;
   totalTags: number;
-  totalReminders: number;
+
 }
 
 export const QuickStats: React.FC = () => {
@@ -14,7 +14,7 @@ export const QuickStats: React.FC = () => {
     totalNotes: 0,
     totalNotebooks: 0,
     totalTags: 0,
-    totalReminders: 0
+
   });
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export const QuickStats: React.FC = () => {
     { label: 'Notes', value: stats.totalNotes, icon: FileText, color: 'text-blue-600' },
     { label: 'Notebooks', value: stats.totalNotebooks, icon: Book, color: 'text-green-600' },
     { label: 'Tags', value: stats.totalTags, icon: Tag, color: 'text-purple-600' },
-    { label: 'Reminders', value: stats.totalReminders, icon: Bell, color: 'text-orange-600' },
+
   ];
 
   return (

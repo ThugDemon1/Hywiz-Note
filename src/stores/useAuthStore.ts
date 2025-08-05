@@ -32,6 +32,7 @@ interface AuthState {
   verifyToken: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
   updatePreferences: (preferences: Partial<User['preferences']>) => Promise<void>;
+  clearToken: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -48,7 +49,12 @@ export const useAuthStore = create<AuthState>()(
           const response = await api.post('/auth/login', { email, password });
           const { token, user } = response.data;
           
+          console.log('Login successful, token received:', token ? 'YES' : 'NO');
+          console.log('Token length:', token ? token.length : 0);
+          
           localStorage.setItem('token', token);
+          console.log('Token stored in localStorage:', localStorage.getItem('token') ? 'YES' : 'NO');
+          
           set({ 
             user, 
             token, 
@@ -89,13 +95,24 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
+      clearToken: () => {
+        localStorage.removeItem('token');
+        set({ 
+          user: null, 
+          token: null, 
+          isAuthenticated: false 
+        });
+      },
+
       verifyToken: async () => {
         const token = localStorage.getItem('token');
+        console.log('verifyToken called, token in localStorage:', token ? 'YES' : 'NO');
         if (!token) return;
 
         set({ isLoading: true });
         try {
           const response = await api.get('/auth/verify');
+          console.log('Token verification successful');
           set({ 
             user: response.data.user, 
             token, 
@@ -103,6 +120,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false 
           });
         } catch (error) {
+          console.log('Token verification failed:', error);
           localStorage.removeItem('token');
           set({ 
             user: null, 

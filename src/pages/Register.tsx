@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { useToastStore } from '../stores/useToastStore';
 
 export const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -12,41 +13,37 @@ export const Register: React.FC = () => {
   const [error, setError] = useState('');
   
   const { register, isLoading } = useAuthStore();
+  const showToast = useToastStore((state) => state.showToast);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      showToast('Passwords do not match', 'error');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      showToast('Password must be at least 6 characters long', 'error');
       return;
     }
 
     try {
       await register(name, email, password);
+      showToast('Registration successful!', 'success');
     } catch (err: any) {
-      setError(err.message);
+      showToast(err.message || 'Registration failed', 'error');
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+      <div className="max-w-md w-full bg-[#181818] rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
           <p className="text-gray-600">Join Evernote and start organizing your notes</p>
         </div>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>

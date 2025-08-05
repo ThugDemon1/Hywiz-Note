@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useNotesStore } from '../stores/useNotesStore';
+import { Navigate } from 'react-router-dom';
 
 // Components
 import { QuickStats } from '../components/dashboard/QuickStats';
@@ -8,33 +9,17 @@ import { RecentNotes } from '../components/dashboard/RecentNotes';
 import { ScratchPad } from '../components/dashboard/ScratchPad';
 import { QuickShortcuts } from '../components/dashboard/QuickShortcuts';
 import { RecentlyCaptured } from '../components/dashboard/RecentlyCaptured';
-import { UpcomingReminders } from '../components/dashboard/UpcomingReminders';
+
 import { DashboardAnalytics } from '../components/dashboard/DashboardAnalytics';
 
 const Dashboard: React.FC = () => {
   const [activeView, setActiveView] = useState<'overview' | 'analytics'>('overview');
-  const { user } = useAuthStore();
-  const { dueReminders, checkDueReminders } = useNotesStore();
-  const [shownReminders, setShownReminders] = useState<string[]>([]);
-
+  const { isAuthenticated, isLoading, user } = useAuthStore();
   const backgroundImage = user?.preferences?.backgroundImage;
   const greeting = user?.preferences?.greeting || 'Welcome back!';
 
-  useEffect(() => {
-    checkDueReminders();
-    const interval = setInterval(() => checkDueReminders(), 60000);
-    return () => clearInterval(interval);
-  }, [checkDueReminders]);
-
-  useEffect(() => {
-    dueReminders.forEach(reminder => {
-      if (!shownReminders.includes(reminder._id)) {
-        // Show toast (replace with your toast lib if needed)
-        alert(`Reminder: ${reminder.title}\n${reminder.plainTextContent?.slice(0, 100)}`);
-        setShownReminders(prev => [...prev, reminder._id]);
-      }
-    });
-  }, [dueReminders, shownReminders]);
+  if (isLoading) return null;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return (
     <div
@@ -99,8 +84,7 @@ const Dashboard: React.FC = () => {
                 {/* Quick Shortcuts */}
                 <QuickShortcuts />
                 
-                {/* Upcoming Reminders */}
-                <UpcomingReminders />
+
                 
                 {/* Scratch Pad */}
                 <ScratchPad />

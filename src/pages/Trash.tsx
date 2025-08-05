@@ -77,11 +77,11 @@ export const Trash: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-gray-50">
+    <div className="h-full flex flex-col bg-black-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-6">
+      <div className="bg-black-100 border-b border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold text-gray-900">Trash</h1>
+          <h1 className="text-2xl font-semibold text-white">Trash</h1>
           {selectedNotes.length > 0 && (
             <div className="flex items-center space-x-2">
               <button
@@ -167,7 +167,7 @@ export const Trash: React.FC = () => {
                     </p>
                     
                     <div className="flex items-center space-x-4 text-xs text-gray-500">
-                      <span>{note.notebookId.name}</span>
+                      <span>{note.primaryNotebookId?.name || 'My Notes'}</span>
                       {note.deletedAt && (
                         <div className="flex items-center space-x-1">
                           <Calendar className="w-3 h-3" />

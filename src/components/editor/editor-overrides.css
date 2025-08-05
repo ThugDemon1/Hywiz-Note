@@ -2,4 +2,313 @@
   direction: ltr !important;
   text-align: left !important;
   unicode-bidi: plaintext !important;
-} 
+}
+
+.ProseMirror h1:first-child {
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
+  color: #bcbcbc !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.editor-title-placeholder {
+  color: #888;
+  opacity: 0.7;
+  font-style: italic;
+  pointer-events: none;
+}
+
+/* Table styles with physical block chevron support */
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.ProseMirror table th,
+.ProseMirror table td {
+  background-color: #232323;
+  color: #fff;
+  border: 1.5px solid #333;
+  min-width: 1em;
+  min-height: 3.5em !important;
+  height: 3.5em !important;
+  margin: 0;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+  /* Ensure proper positioning for chevron block */
+  overflow: visible;
+  padding-top: 9px !important;
+  padding-bottom: 9px !important;
+  line-height: 1.7 !important;
+}
+
+.ProseMirror table th > *,
+.ProseMirror table td > * {
+  line-height: 1.7 !important;
+  min-height: 2em !important;
+}
+
+.ProseMirror table th p,
+.ProseMirror table td p {
+  margin: 0 !important;
+}
+
+.ProseMirror table th {
+  font-weight: bold;
+  text-align: left;
+}
+
+.ProseMirror table .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(200, 200, 255, 0.4);
+  pointer-events: none;
+}
+
+.ProseMirror table .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background-color: #adf;
+  pointer-events: none;
+}
+
+/* Physical block chevron styles */
+.table-chevron-block {
+  position: fixed !important;
+  width: 28px !important;
+  height: 28px !important;
+  background: rgba(30,30,30,0.7) !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 1000 !important;
+  transition: background 0.15s, box-shadow 0.15s !important;
+  user-select: none !important;
+  pointer-events: auto !important;
+}
+
+.table-chevron-block:hover {
+  background: rgba(60,60,60,0.85) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+
+/* Cell dropdown styles */
+.cell-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.cell-dropdown-button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.cell-dropdown-button:hover {
+  background: #444;
+}
+
+.cell-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #232323;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 8px;
+  min-width: 150px;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.cell-dropdown-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: white;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.cell-dropdown-menu button:hover {
+  background-color: #444;
+}
+
+/* Color palette styles */
+.color-palette {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #444;
+}
+
+.color-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #666;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.color-dot:hover {
+  transform: scale(1.35);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+/* Ensure lists are visible in the editor */
+.ProseMirror ul {
+  list-style-type: disc;
+  margin-left: 1.5em;
+}
+.ProseMirror ol {
+  list-style-type: decimal;
+  margin-left: 1.5em;
+}
+
+/* Only force white for headings, strong, b, and label, but allow override by inline styles or color pickers */
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6,
+.ProseMirror strong,
+.ProseMirror b,
+.ProseMirror label,
+[contenteditable="true"] h1,
+[contenteditable="true"] h2,
+[contenteditable="true"] h3,
+[contenteditable="true"] h4,
+[contenteditable="true"] h5,
+[contenteditable="true"] h6,
+[contenteditable="true"] strong,
+[contenteditable="true"] b,
+[contenteditable="true"] label {
+  color: #fff;
+}
+
+/* Force all common inline tags to inherit color from parent, even if overridden elsewhere */
+.ProseMirror strong,
+.ProseMirror b,
+.ProseMirror em,
+.ProseMirror i,
+.ProseMirror code,
+.ProseMirror mark,
+[contenteditable="true"] strong,
+[contenteditable="true"] b,
+[contenteditable="true"] em,
+[contenteditable="true"] i,
+[contenteditable="true"] code,
+[contenteditable="true"] mark {
+  color: inherit !important;
+}
+
+/* Show dropdown button on cell hover (more stable) */
+.cell-dropdown-container:hover .cell-dropdown-button {
+  opacity: 1 !important;
+}
+
+/* Show a chevron button on cell and header hover */
+.ProseMirror td,
+.ProseMirror th {
+  position: relative;
+}
+
+/* Remove chevron pseudo-element from table cells */
+/* .ProseMirror td::after,
+.ProseMirror th::after {
+  content: '\2304';
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  font-size: 24px;
+  color: #aaa;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.ProseMirror td:hover::after,
+.ProseMirror th:hover::after {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+} */
+
+/* Dropdown menu styles */
+.table-cell-dropdown {
+  display: none;
+  position: absolute;
+  top: 32px;
+  right: 4px;
+  min-width: 120px;
+  background: #232323;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 100;
+  padding: 8px 0;
+}
+
+.ProseMirror td:hover .table-cell-dropdown,
+.ProseMirror th:hover .table-cell-dropdown {
+  display: block;
+}
+
+.table-cell-dropdown button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+  border-radius: 0;
+  transition: background 0.2s;
+}
+
+.table-cell-dropdown button:hover {
+  background: #353A40;
+}
+
+/* Hide TipTap/Yjs collaborative cursor labels */
+.collaboration-cursor__label {
+  display: none !important;
+}

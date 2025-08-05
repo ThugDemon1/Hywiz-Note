@@ -40,6 +40,8 @@ router.post('/', auth, async (req, res) => {
     });
 
     await tag.save();
+    // Emit real-time update
+    req.io.emit('tag-created', { tag, userId: req.userId });
 
     res.status(201).json(tag);
   } catch (error) {
@@ -70,6 +72,8 @@ router.put('/:id', auth, async (req, res) => {
     if (description !== undefined) tag.description = description;
 
     await tag.save();
+    // Emit real-time update
+    req.io.emit('tag-updated', { tag, userId: req.userId });
 
     // Update tag name in all notes if name changed
     if (name && name.toLowerCase() !== oldName) {
@@ -105,6 +109,8 @@ router.delete('/:id', auth, async (req, res) => {
     );
 
     await Tag.findByIdAndDelete(req.params.id);
+    // Emit real-time update
+    req.io.emit('tag-deleted', { tagId: req.params.id, userId: req.userId });
 
     res.json({ message: 'Tag deleted' });
   } catch (error) {

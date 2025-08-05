@@ -11,7 +11,7 @@ const shortcuts = [
   { id: 'tags', name: 'Tags', icon: Tag, path: '/tags' },
   { id: 'search', name: 'Search', icon: Search, action: 'search' },
   { id: 'shared', name: 'Shared', icon: Users, path: '/shared' },
-  { id: 'reminders', name: 'Reminders', icon: Bell, path: '/reminders' },
+
 ];
 
 export const QuickShortcuts: React.FC = () => {

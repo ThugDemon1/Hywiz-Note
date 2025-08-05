@@ -18,7 +18,7 @@ router.get('/', auth, async (req, res) => {
       dateFrom,
       dateTo,
       hasAttachments,
-      hasReminders,
+
       page = 1,
       limit = 20
     } = req.query;
@@ -43,7 +43,7 @@ router.get('/', auth, async (req, res) => {
       };
 
       // Apply filters
-      if (notebook) noteQuery.notebookId = notebook;
+      if (notebook) noteQuery.primaryNotebookId = notebook;
       if (tags) noteQuery.tags = { $in: tags.split(',') };
       if (dateFrom || dateTo) {
         noteQuery.createdAt = {};
@@ -53,12 +53,10 @@ router.get('/', auth, async (req, res) => {
       if (hasAttachments === 'true') {
         noteQuery['attachments.0'] = { $exists: true };
       }
-      if (hasReminders === 'true') {
-        noteQuery.reminderDate = { $exists: true, $ne: null };
-      }
+
 
       let notes = await Note.find(noteQuery, { score: { $meta: 'textScore' } })
-        .populate('notebookId', 'name color')
+        .populate('primaryNotebookId', 'name color')
         .sort({ score: { $meta: 'textScore' } })
         .limit(limit * 1)
         .skip((page - 1) * limit);
@@ -76,7 +74,7 @@ router.get('/', auth, async (req, res) => {
             { plainTextContent: regex }
           ]
         };
-        if (notebook) regexQuery.notebookId = notebook;
+        if (notebook) regexQuery.primaryNotebookId = notebook;
         if (tags) regexQuery.tags = { $in: tags.split(',') };
         if (dateFrom || dateTo) {
           regexQuery.createdAt = {};
@@ -86,11 +84,9 @@ router.get('/', auth, async (req, res) => {
         if (hasAttachments === 'true') {
           regexQuery['attachments.0'] = { $exists: true };
         }
-        if (hasReminders === 'true') {
-          regexQuery.reminderDate = { $exists: true, $ne: null };
-        }
+
         notes = await Note.find(regexQuery)
-          .populate('notebookId', 'name color')
+          .populate('primaryNotebookId', 'name color')
           .limit(limit * 1)
           .skip((page - 1) * limit);
         notesTotal = await Note.countDocuments(regexQuery);

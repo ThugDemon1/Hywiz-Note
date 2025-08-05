@@ -160,6 +160,16 @@ body, html {
   background: #a8a8a8;
 }
 
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
 /* TipTap Editor Styles */
 .ProseMirror {
   outline: none;
@@ -215,22 +225,26 @@ body, html {
   width: 100%;
   margin: 0;
   overflow: hidden;
+  background: #181818;
+  color: #fff;
+  border: 1px solid #333;
 }
 
 .ProseMirror table td,
 .ProseMirror table th {
   min-width: 1em;
-  border: 2px solid #ced4da;
+  border: 1.5px solid #333;
   padding: 3px 5px;
   vertical-align: top;
   box-sizing: border-box;
   position: relative;
+  background: #232323;
+  color: #fff;
 }
 
 .ProseMirror table th {
   font-weight: bold;
   text-align: left;
-  background-color: #f1f3f4;
 }
 
 .ProseMirror table .selectedCell:after {
@@ -339,4 +353,86 @@ body, html {
   .editor-toolbar {
     display: none !important;
   }
+}
+
+.ProseMirror, [contenteditable="true"] {
+  color: #fff !important;
+}
+
+.ProseMirror pre, .ProseMirror code {
+  background: #181818 !important;
+  color: #fff !important;
+  border-radius: 6px;
+}
+.ProseMirror table {
+  background: #181818 !important;
+  color: #fff !important;
+  border: 1px solid #333 !important;
+}
+.ProseMirror table th, .ProseMirror table td {
+  color: #fff;
+  border: 1.5px solid #333;
+}
+.ProseMirror blockquote {
+  background: #232323 !important;
+  color: #fff !important;
+  border-left: 4px solid #3b82f6 !important;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+}
+.ProseMirror ul[data-type="taskList"] input[type="checkbox"] {
+  border: 2px solid #fff !important;
+  border-radius: 5px;
+  accent-color: #fff !important;
+  padding: 7px;
+}
+
+.ProseMirror mark[data-type="highlight"] {
+  background: #333 !important;
+  color: #fff !important;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+.ProseMirror span[style*="background-color"] {
+  background-color: #333 !important;
+  color: #fff !important;
+}
+
+.ProseMirror hr {
+  border: none;
+  border-top: 2px solid #444;
+  margin: 1em 0;
+}
+.ProseMirror a {
+  color: #3b82f6 !important;
+  text-decoration: underline;
+}
+
+.ProseMirror ul, .ProseMirror ol {
+  color: #fff !important;
+}
+.ProseMirror li {
+  color: #fff !important;
+}
+.ProseMirror ul li::marker, .ProseMirror ol li::marker {
+  color: #fff !important;
+}
+
+/* Removed forced white color for headings, strong, b, and label in ProseMirror/editor to allow color pickers and inline styles to work */
+/*
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6, .ProseMirror strong, .ProseMirror b, .ProseMirror label, [contenteditable="true"] h1, [contenteditable="true"] h2, [contenteditable="true"] h3, [contenteditable="true"] h4, [contenteditable="true"] h5, [contenteditable="true"] h6, [contenteditable="true"] strong, [contenteditable="true"] b, [contenteditable="true"] label {
+    color: #fff !important;
+}
+*/
+
+select.appearance-none {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: #181818;
+  color: #fff;
+}
+select.appearance-none option {
+  background: #181818;
+  color: #fff;
 }

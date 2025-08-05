@@ -123,12 +123,7 @@ export const useKeyboardShortcuts = () => {
             }
             break;
 
-          case '5':
-            if (ctrlKey || metaKey) {
-              event.preventDefault();
-              navigate('/reminders');
-            }
-            break;
+
 
           case '6':
             if (ctrlKey || metaKey) {

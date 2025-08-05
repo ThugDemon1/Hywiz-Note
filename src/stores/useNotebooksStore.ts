@@ -122,3 +122,25 @@ export const useNotebooksStore = create<NotebooksState>((set, get) => ({
     return get().notebooks.find(notebook => notebook._id === id);
   },
 }));
+
+// --- SOCKET.IO REALTIME LISTENERS ---
+import socket from '../lib/socket';
+if (typeof window !== 'undefined' && socket && !(window as any)._notebooksListenersAdded) {
+  socket.on('notebook-created', ({ notebook }) => {
+    useNotebooksStore.setState(state => ({ notebooks: [...state.notebooks, notebook] }));
+  });
+  socket.on('notebook-updated', ({ notebook }) => {
+    useNotebooksStore.setState(state => ({
+      notebooks: state.notebooks.map(n => n._id === notebook._id ? notebook : n),
+      currentNotebook: state.currentNotebook && state.currentNotebook._id === notebook._id ? notebook : state.currentNotebook,
+      defaultNotebook: notebook.isDefault ? notebook : state.defaultNotebook
+    }));
+  });
+  socket.on('notebook-deleted', ({ notebookId }) => {
+    useNotebooksStore.setState(state => ({
+      notebooks: state.notebooks.filter(n => n._id !== notebookId),
+      currentNotebook: state.currentNotebook && state.currentNotebook._id === notebookId ? null : state.currentNotebook
+    }));
+  });
+  (window as any)._notebooksListenersAdded = true;
+}

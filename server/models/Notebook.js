@@ -6,11 +6,6 @@ const notebookSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  description: {
-    type: String,
-    trim: true,
-    default: ''
-  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -20,23 +15,11 @@ const notebookSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  color: {
-    type: String,
-    default: '#3B82F6'
-  },
   icon: {
     type: String,
     default: 'book'
   },
   isDefault: {
-    type: Boolean,
-    default: false
-  },
-  coverImage: {
-    type: String,
-    default: ''
-  },
-  isArchived: {
     type: Boolean,
     default: false
   },
@@ -65,7 +48,6 @@ const notebookSchema = new mongoose.Schema({
 
 // Indexes for better query performance
 notebookSchema.index({ userId: 1, isDefault: 1 });
-notebookSchema.index({ userId: 1, isArchived: 1 });
 notebookSchema.index({ userId: 1, sortOrder: 1 });
 
 // Ensure only one default notebook per user

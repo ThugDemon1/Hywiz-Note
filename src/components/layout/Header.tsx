@@ -60,7 +60,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+    <header className="bg-[#181818] dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
       <div className="flex items-center justify-between">
         {/* Left Section */}
         <div className="flex items-center space-x-4">
@@ -137,7 +137,7 @@ const Header: React.FC = () => {
             </button>
 
             {showNotificationsMenu && (
-              <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+              <div className="absolute right-0 mt-2 w-80 bg-[#181818] dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
                 <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                   <h3 className="text-sm font-medium text-gray-900 dark:text-white">Notifications</h3>
                 </div>
@@ -146,10 +146,7 @@ const Header: React.FC = () => {
                     <p className="text-sm text-gray-900 dark:text-white">New note shared with you</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">2 minutes ago</p>
                   </div>
-                  <div className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600">
-                    <p className="text-sm text-gray-900 dark:text-white">Reminder: Meeting in 30 minutes</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">5 minutes ago</p>
-                  </div>
+
                   <div className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <p className="text-sm text-gray-900 dark:text-white">Backup completed successfully</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">1 hour ago</p>

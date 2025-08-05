@@ -83,7 +83,7 @@ export const navigationItems: NavigationItem[] = [
   { id: 'notes', name: 'All Notes', icon: 'file-text' },
   { id: 'notebooks', name: 'Notebooks', icon: 'book' },
   { id: 'shared', name: 'Shared with Me', icon: 'users' },
-  { id: 'reminders', name: 'Reminders', icon: 'bell' },
+
   { id: 'tags', name: 'Tags', icon: 'tag' },
   { id: 'trash', name: 'Trash', icon: 'trash-2' }
 ];

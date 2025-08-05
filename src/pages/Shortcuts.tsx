@@ -26,7 +26,7 @@ const mockShortcuts: Shortcut[] = [
   { id: '2', name: 'Work Notebook', icon: 'book', type: 'notebook', target: 'work-notebook-id', position: 2 },
   { id: '3', name: 'Important', icon: 'tag', type: 'tag', target: 'important', position: 3 },
   { id: '4', name: 'Shared Projects', icon: 'users', type: 'search', target: 'shared:true', position: 4 },
-  { id: '5', name: 'Today\'s Reminders', icon: 'bell', type: 'search', target: 'reminder:today', position: 5 },
+
   { id: '6', name: 'Quick Ideas', icon: 'zap', type: 'notebook', target: 'ideas-notebook-id', position: 6 },
 ];
 

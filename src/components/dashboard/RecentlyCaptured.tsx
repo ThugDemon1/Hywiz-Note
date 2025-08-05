@@ -52,7 +52,7 @@ export const RecentlyCaptured: React.FC = () => {
   const currentItems = mockItems[activeTab as keyof typeof mockItems] || [];
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
+    <div className="bg-[#181818] rounded-lg p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Recently Captured</h2>
         <button className="text-sm text-blue-600 hover:text-blue-700">
@@ -60,7 +60,7 @@ export const RecentlyCaptured: React.FC = () => {
         </button>
       </div>
 
-      <div className="flex space-x-1 mb-4 bg-gray-100 rounded-lg p-1">
+      <div className="flex space-x-1 mb-4 bg-[#232323] rounded-lg p-1">
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           return (
@@ -69,8 +69,8 @@ export const RecentlyCaptured: React.FC = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-[#181818] text-white shadow-sm'
+                  : 'text-gray-300 hover:text-white'
               }`}
             >
               <IconComponent className="w-4 h-4" />

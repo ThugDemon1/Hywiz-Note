@@ -66,13 +66,15 @@ export const RecentNotes: React.FC = () => {
                 <div className="flex items-center space-x-2 mb-1">
                   <h3 className="font-medium text-gray-900 truncate">{note.title}</h3>
                   {note.isPinned && <Pin className="w-3 h-3 text-yellow-500" />}
-                  {note.reminderDate && <Calendar className="w-3 h-3 text-blue-500" />}
+
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-2 mb-2">
                   {note.plainTextContent}
                 </p>
                 <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span>{note.notebookId.name}</span>
+                  <span>
+                    {note.primaryNotebookId?.name || 'My Notes'}
+                  </span>
                   <span>{new Date(note.updatedAt).toLocaleDateString()}</span>
                 </div>
               </div>

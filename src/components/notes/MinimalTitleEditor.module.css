@@ -1,0 +1,31 @@
+.minimalTitleEditor {
+  display: flex;
+  align-items: center;
+  min-height: 0;
+  width: 100%;
+  /* Inherit all font, color, padding, margin, etc. from parent */
+}
+
+.minimalTitleEditor :global(.ProseMirror) {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+  font: inherit !important;
+  color: inherit !important;
+  line-height: inherit !important;
+}
+
+.minimalTitleEditor :global(.ProseMirror p) {
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: inherit !important;
+  color: inherit !important;
+  line-height: inherit !important;
+} 

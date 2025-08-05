@@ -20,10 +20,21 @@ export default {
           800: '#1e40af',
           900: '#1e3a8a',
         },
+        evernote: {
+          bg: '#22272B',
+          card: '#2D333A',
+          border: '#3A4046',
+          accent: '#00A82D',
+          text: '#F7F8FA',
+          muted: '#A3A7AB',
+          hover: '#23282D',
+          active: '#1B1F23',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        evernote: ['Segoe UI', 'Helvetica Neue', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
@@ -182,6 +193,28 @@ export default {
             },
           },
         },
+      },
+      spacing: {
+        'btn-h': '40px',
+        'btn-px': '16px',
+        'btn-py': '8px',
+        'card-p': '16px',
+        'gap': '12px',
+        'gap-lg': '16px',
+        'icon': '20px',
+      },
+      borderRadius: {
+        'evernote': '8px',
+      },
+      fontSize: {
+        'evernote-base': ['15px', '22px'],
+        'evernote-title': ['20px', '28px'],
+      },
+      boxShadow: {
+        'evernote': '0 1px 4px 0 rgba(0,0,0,0.10)',
+      },
+      strokeWidth: {
+        'evernote': '1.5',
       },
     },
   },

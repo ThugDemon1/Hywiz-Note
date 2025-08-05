@@ -12,10 +12,10 @@ interface SearchModalProps {
 interface SearchFilters {
   query: string;
   dateRange: 'all' | 'today' | 'week' | 'month' | 'year' | 'custom';
-  notebookId: string | null;
+  primaryNotebookId: string | null;
   tags: string[];
   hasAttachments: boolean;
-  hasReminders: boolean;
+
   isPinned: boolean;
   sortBy: 'relevance' | 'updatedAt' | 'createdAt' | 'title';
   sortOrder: 'asc' | 'desc';
@@ -25,10 +25,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
   const [filters, setFilters] = useState<SearchFilters>({
     query: '',
     dateRange: 'all',
-    notebookId: null,
+    primaryNotebookId: null,
     tags: [],
     hasAttachments: false,
-    hasReminders: false,
+
     isPinned: false,
     sortBy: 'relevance',
     sortOrder: 'desc'
@@ -109,10 +109,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
     setFilters({
       query: '',
       dateRange: 'all',
-      notebookId: null,
+      primaryNotebookId: null,
       tags: [],
       hasAttachments: false,
-      hasReminders: false,
+
       isPinned: false,
       sortBy: 'relevance',
       sortOrder: 'desc'
@@ -193,8 +193,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                   Notebook
                 </label>
                 <select
-                  value={filters.notebookId || ''}
-                  onChange={(e) => setFilters({ ...filters, notebookId: e.target.value || null })}
+                  value={filters.primaryNotebookId || ''}
+                  onChange={(e) => setFilters({ ...filters, primaryNotebookId: e.target.value || null })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                 >
                   <option value="">All notebooks</option>
@@ -252,15 +252,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                 />
                 <span className="ml-2 text-sm text-gray-700">Has attachments</span>
               </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={filters.hasReminders}
-                  onChange={(e) => setFilters({ ...filters, hasReminders: e.target.checked })}
-                  className="rounded"
-                />
-                <span className="ml-2 text-sm text-gray-700">Has reminders</span>
-              </label>
+
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -367,7 +359,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                           {note.plainTextContent}
                         </p>
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
-                          <span>{note.notebookId?.name}</span>
+                          <span>{note.primaryNotebookId?.name}</span>
                           {note.tags && note.tags.length > 0 && (
                             <div className="flex space-x-1">
                               {note.tags.slice(0, 3).map((tag) => (

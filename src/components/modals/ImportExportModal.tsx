@@ -149,7 +149,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({ mode }) =>
                     <div className="flex-1 min-w-0">
                       <div className="font-medium truncate">{note.title}</div>
                       <div className="text-sm text-gray-500 truncate">
-                        {note.notebookId?.name || 'Unknown Notebook'}
+                        {note.primaryNotebookId?.name || 'Unknown Notebook'}
                       </div>
                     </div>
                   </label>

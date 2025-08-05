@@ -74,7 +74,7 @@ export const DashboardAnalytics: React.FC = () => {
     // Calculate notes by notebook - fix notebookId access
     const notesByNotebook = notebooks.map(notebook => ({
       name: notebook.name,
-      count: notes.filter(note => note.notebookId._id === notebook._id).length
+      count: notes.filter(note => note.primaryNotebookId?._id === notebook._id).length
     })).sort((a, b) => b.count - a.count).slice(0, 5);
 
     // Calculate notes by tag - fix tags access
@@ -150,7 +150,7 @@ export const DashboardAnalytics: React.FC = () => {
     change?: number;
     changeLabel?: string;
   }> = ({ title, value, icon: Icon, change, changeLabel }) => (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="bg-[#181818] dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
@@ -184,7 +184,7 @@ export const DashboardAnalytics: React.FC = () => {
     title: string;
     children: React.ReactNode;
   }> = ({ title, children }) => (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="bg-[#181818] dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</h3>
       {children}
     </div>
@@ -194,7 +194,7 @@ export const DashboardAnalytics: React.FC = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse">
+          <div key={i} className="bg-[#181818] dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse">
             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
           </div>

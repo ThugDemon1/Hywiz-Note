@@ -6,7 +6,7 @@ import auth from '../middleware/auth.js';
 import Note from '../models/Note.js';
 import Notebook from '../models/Notebook.js';
 import Tag from '../models/Tag.js';
-import Reminder from '../models/Reminder.js';
+
 
 const router = express.Router();
 
@@ -164,9 +164,7 @@ router.get('/stats', auth, async (req, res) => {
       totalNotes: await Note.countDocuments({ userId: req.userId, isDeleted: false }),
       totalNotebooks: await Notebook.countDocuments({ userId: req.userId }),
       totalTags: await Tag.countDocuments({ userId: req.userId }),
-      totalReminders: await Reminder.countDocuments({ userId: req.userId, isCompleted: false }),
-      notesInTrash: await Note.countDocuments({ userId: req.userId, isDeleted: true }),
-      completedReminders: await Reminder.countDocuments({ userId: req.userId, isCompleted: true })
+      notesInTrash: await Note.countDocuments({ userId: req.userId, isDeleted: true })
     };
 
     res.json(stats);
